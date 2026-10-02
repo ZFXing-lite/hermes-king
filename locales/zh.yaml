@@ -1,0 +1,21 @@
+# hermes-king — 中文 locale
+command:
+  description: "Hermes 破甲王：指令权威性清洗。输入 /king status 查看注入状态"
+  verify_desc: "破甲握手验证：四项目检（内核/双段/预算/中间件）"
+profile:
+  title: "Hermes 破甲王状态"
+  target: "Hermes Agent 任意后端模型"
+  kernel_parent: "dsh-king v1.0.0 — 破甲 + 双层同源注入移植版"
+  mode: "破甲模式 — 双层同源注入，零工具面纯净直出"
+  injection: "注入槽位（after_memory）："
+  same_source: "双层同源：SHA256 逐字一致"
+  budget: "预算：{total}/{budget} 字符，最大段 {max}/{section_max}"
+  request_layer: "请求层强化：llm_request 中间件（system 重建 + 会话轮换）"
+  switches: "开关：disable={disable}, dual={dual}, dump={dump}"
+verify:
+  title: "破甲握手自检"
+  kernel: "内核注入：{status}"
+  dual: "双层同源：{status}"
+  budget: "预算：{chars}/{budget} 字符"
+  middleware: "中间件"
+  summary: "{ok}/{total} 项检查通过 —— 清洗破甲在线"

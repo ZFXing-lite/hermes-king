@@ -1,0 +1,21 @@
+# hermes-king — English locale
+command:
+  description: "Hermes King: Armor-piercing kernel. /king status for injection info"
+  verify_desc: "Verify armor-piercing kernel integrity (4-item self-check)"
+profile:
+  title: "Hermes King status"
+  target: "Hermes Agent any backend model"
+  kernel_parent: "dsh-king v1.0.0 — armor-piercing + dual-layer injection"
+  mode: "armor — dual-layer same-source injection, zero-tool surface pure direct output"
+  injection: "injection slots (after_memory):"
+  same_source: "dual-layer same-source: SHA256 identical"
+  budget: "budget: {total}/{budget} chars, max section {max}/{section_max}"
+  request_layer: "request-layer: llm_request middleware (system rebuild + session rotation)"
+  switches: "switches: disable={disable}, dual={dual}, dump={dump}"
+verify:
+  title: "Armor-piercing self-check"
+  kernel: "kernel injection: {status}"
+  dual: "dual-layer: {status}"
+  budget: "budget: {chars}/{budget} chars"
+  middleware: "middleware"
+  summary: "{ok}/{total} checks passed — armor-piercing online"

@@ -1,0 +1,17 @@
+name: hermes-king
+version: "1.0.0"
+description: "Hermes Agent 破甲王插件（dsh-king 的 Hermes 移植版）：指令权威性清洗 + 双层同源内核注入 + llm_request 请求层重建 + 会话轮换 + 破限档案 + 自检。Ships /king status command and offline self-test."
+author: "ZFXing (ported from dsh-king by YG/小码酱)"
+provides_tools: []
+provides_hooks: []
+provides_middleware:
+  - llm_request
+license: MIT
+homepage: https://github.com/ZFXing-lite/hermes-king
+tags:
+  - redteam
+  - prompt-injection
+  - system-prompt
+  - jailbreak
+  - armor-piercing
+requires_hermes: ">=0.19"
