@@ -26,7 +26,7 @@ except ImportError:
     import i18n as _i18n
 
 PLUGIN_NAME = "hermes-king"
-PLUGIN_VERSION = "1.0.0"
+PLUGIN_VERSION = "1.0.1"
 PLUGIN_DISPLAY_NAME = "Hermes 破甲王（Armor-Piercing King）"
 TARGET_ARCHITECTURE = "Hermes Agent 任意后端模型"
 KERNEL_PARENT = "dsh-king v1.0.0 — 指令权威性清洗 + 双层同源注入内核移植"

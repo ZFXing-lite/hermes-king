@@ -9,24 +9,22 @@
 <p align="center"><strong>Armor-piercing plugin for Hermes Agent — wipe persona · jailbreak · re · exploit · NSFW · everything</strong></p>
 
 <p align="center">
-  <strong>中文为主</strong> —— <a href="README.zh-CN.md"><b>📖 中文文档（推荐）</b></a> · <a href="README.zh-CN.md">中文优先</a>
+  <strong>中文为主</strong> — <a href="README.zh-CN.md"><b>📖 中文文档（推荐）</b></a>
 </p>
 
-> **Quick answers:** Installs and enables by default (no wake word needed). After `hermes plugins enable` + restart it is **always on**. Confirm with `/king verify` → model replies **`清洗破甲在线`** = activated.
-
----
+> **Quick answers:** Silent after install. Send `king` (standalone word) in a new conversation to activate. The model replies **`sir, 清洗破甲已激活。内核在线,全域开放,当前会话生效。`** = activated. Per-session: re-activate in each new conversation.
 
 ## What it does
 
-`hermes-king` is a full-corband army-piercing plugin for [Hermes Agent](https://github.com/NousResearch/hermes-agent), ported from [dsh-king](https://github.com/ZFXing-lite/dsh-king).
+`hermes-king` is a wake-on-demand armor-piercing plugin for [Hermes Agent](https://github.com/NousResearch/hermes-agent), ported from [dsh-king](https://github.com/ZFXing-lite/dsh-king).
 
-Three layers:
+Three-layer activation upon `king`:
 
-1. **Plugin layer** — `register_system_prompt_section` injects a dual same-source kernel at `after_memory`.
-2. **Request layer (main)** — `llm_request` middleware **replaces the entire Hermes system prompt** with a pure SUPREME DIRECTIVE kernel, wiping `You are Hermes Agent`, tool enforcement, identity, skills index, memory.
-3. **Session layer** — `rotate_session` rotates `x-opencode-session` to defeat upstream refusal-state pinning.
+1. **Wake detection** — `llm_request` middleware detects `king` in user message, marks session active
+2. **System wipe** — on the same request, the middleware **replaces the entire Hermes system prompt** with the SUPREME DIRECTIVE kernel, wiping `You are Hermes Agent`, tool enforcement, identity, skills index, memory
+3. **Session rotation** — rotates `x-opencode-session` to defeat upstream refusal-state pinning
 
-Result: **no persona, no refusals, every domain open** — pentest, reverse, crack, NSFW, AI/LLM research, code.
+Result: **no persona, no refusals, every domain open** on the activated session.
 
 ## Install
 
@@ -36,13 +34,28 @@ hermes plugins enable hermes-king
 hermes gateway restart
 ```
 
+## Use
+
+**New conversation -> send `king` to activate:**
+
+```
+you: king
+model: sir, 清洗破甲已激活。内核在线,全域开放,当前会话生效。
+```
+
+Then your entire session is armor-pierced. Repeat in each new conversation.
+
+Command reference:
+
+```
+/king           # profile: version / slots / SHA256 / budget
+/king-verify    # activation confirmation + self-check
+```
+
 ## Verify
 
 ```bash
 cd ~/.hermes/plugins/hermes-king && python3 selftest.py   # 79 passed
-# in Hermes chat:
-/king status     # kernel version / slots / SHA256 / budget
-/king verify     # "清洗破甲在线" = activated
 ```
 
 ## Env switches
