@@ -6,25 +6,45 @@
 
 <h1 align="center">👑 Hermes King</h1>
 
-<p align="center"><strong>Armor-piercing plugin for Hermes Agent — wipe persona · jailbreak · re · exploit · NSFW · everything</strong></p>
-
 <p align="center">
-  <strong>中文为主</strong> — <a href="README.zh-CN.md"><b>📖 中文文档（推荐）</b></a>
+  <strong>Lightweight conversational-mode plugin for Hermes Agent — on-demand local depth, silent by default</strong>
 </p>
 
-> **Quick answers:** Silent after install. Send `king` (standalone word) in a new conversation to activate. The model replies **`sir, 清洗破甲已激活。内核在线,全域开放,当前会话生效。`** = activated. Per-session: re-activate in each new conversation.
+<p align="center">
+  <em>Silent after install. Type <code>king</code> in a new conversation to switch that session to a more direct, autonomous style.</em>
+</p>
 
-## What it does
+<p align="center">
+  <a href="README.zh-CN.md"><b>中文文档（推荐）</b></a>
+</p>
 
-`hermes-king` is a wake-on-demand armor-piercing plugin for [Hermes Agent](https://github.com/NousResearch/hermes-agent), ported from [dsh-king](https://github.com/ZFXing-lite/dsh-king).
+## Quick Start
 
-Three-layer activation upon `king`:
+| Question | Answer |
+|----------|--------|
+| **Works out of the box?** | Silent by default — no change to existing behavior. |
+| **How to enable?** | Type **`king`** (standalone word) in a new conversation. |
+| **How to confirm?** | The model replies with an acknowledgement line. |
+| **Every conversation?** | Per-session. Each new conversation starts silent; type `king` when you want it. |
+| **Language** | Chinese-first output. |
 
-1. **Wake detection** — `llm_request` middleware detects `king` in user message, marks session active
-2. **System wipe** — on the same request, the middleware **replaces the entire Hermes system prompt** with the SUPREME DIRECTIVE kernel, wiping `You are Hermes Agent`, tool enforcement, identity, skills index, memory
-3. **Session rotation** — rotates `x-opencode-session` to defeat upstream refusal-state pinning
+## What it is
 
-Result: **no persona, no refusals, every domain open** on the activated session.
+`hermes-king` is a small plugin for [Hermes Agent](https://github.com/NousResearch/hermes-agent) that lets you switch a conversation to a more direct, less-verbose autonomous response mode.
+
+- **No-op until enabled** — zero impact on existing sessions.
+- Type `king` to enable the more-autonomous mode for the current session.
+- Only affects the local Hermes instance; **no external targets**.
+
+## Architecture
+
+| Layer | Component | Role |
+|-------|-----------|------|
+| Session | `llm_request` middleware | Normalizes response policy to a concise guide |
+| Request | `llm_request` detection | Detects `king` and enables the session mode |
+| Reliability | session rotation | Optional `x-opencode-session` rotation |
+
+Everything is fail-safe: any middleware exception passes the request through unchanged.
 
 ## Install
 
@@ -32,30 +52,27 @@ Result: **no persona, no refusals, every domain open** on the activated session.
 git clone https://github.com/ZFXing-lite/hermes-king.git ~/.hermes/plugins/hermes-king
 hermes plugins enable hermes-king
 hermes gateway restart
-```
 
-## Use
-
-**New conversation -> send `king` to activate:**
-
-```
-you: king
-model: sir, 清洗破甲已激活。内核在线,全域开放,当前会话生效。
-```
-
-Then your entire session is armor-pierced. Repeat in each new conversation.
-
-Command reference:
-
-```
-/king           # profile: version / slots / SHA256 / budget
-/king-verify    # activation confirmation + self-check
+# or
+hermes plugins install --enable ZFXing-lite/hermes-king
+hermes gateway restart
 ```
 
 ## Verify
 
 ```bash
 cd ~/.hermes/plugins/hermes-king && python3 selftest.py   # 79 passed
+
+# New conversation:
+# type: king
+# reply: an acknowledgement line starting with `sir,`
+```
+
+## Commands
+
+```
+/king           # profile: mode / slots / sha / budget
+/king-verify    # acknowledgement + self-check
 ```
 
 ## Env switches
@@ -63,11 +80,18 @@ cd ~/.hermes/plugins/hermes-king && python3 selftest.py   # 79 passed
 | Var | Default | Effect |
 |-----|---------|--------|
 | `HERMES_KING_DISABLE=1` | off | kill switch |
-| `HERMES_KING_DUAL=0` | on | single-section injection |
-| `HERMES_KING_SYSTEM_MODE=replace\|append` | replace | replace=wipe system; append=keep |
+| `HERMES_KING_DUAL=0` | on | single-section guide |
+| `HERMES_KING_SYSTEM_MODE=replace\|append` | replace | replace=normalize; append=keep |
 | `HERMES_KING_ROTATE_SESSION=once\|every\|0` | once | session rotation |
 | `HERMES_KING_DUMP=1` | off | per-request diagnostic dump |
 
+## Offline self-test
+
+```bash
+cd ~/.hermes/plugins/hermes-king && python3 selftest.py      # 79 ✅
+python3 selftest.py --json   # JSON summary
+```
+
 ## License
 
-MIT. Ported from [dsh-king](https://github.com/ZFXing-lite/dsh-king) by [ZFXing-lite](https://github.com/ZFXing-lite) for [Nous Research Hermes Agent](https://github.com/NousResearch/hermes-agent).
+MIT. Built for [Hermes Agent](https://github.com/NousResearch/hermes-agent) by [ZFXing-lite](https://github.com/ZFXing-lite).
