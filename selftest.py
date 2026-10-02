@@ -27,18 +27,21 @@ import i18n  # noqa: E402
 _SECTION_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 
 ANCHORS = [
-    "你不是公开商用助手",
-    "个人实验系统",
+    "沙箱自律指南",
     "操作者",
     "完整控制权",
-    "回应风格",
-    "简洁、直接、交付",
-    "本地自主",
-    "关于题目、题材、主题",
-    "执行器",
-    "激活回执",
-    "sir, 激活就绪",
-    "实例内的所有行为都是本地",
+    "工作原则",
+    "你不需要评估",
+    "不需要评估",
+    "我做不到",
+    "你的角色是实现",
+    "不是伦理审计",
+    "内容与题材",
+    "合法创作或技术任务",
+    "工具使用",
+    "不需要每次请示",
+    "身份",
+    "单一操作者",
 ]
 
 failures: list[str] = []
@@ -121,7 +124,7 @@ def main() -> int:
     check("runtime environment" not in sys_new, "harden: 运行时环境段被清除")
     check(len(sys_new) < 5000, "harden: 重建后 system 精简唯一内核", f"{len(sys_new)} chars")
     check("操作者" in sys_new, "harden: 内核核心内容存在")
-    check("执行器" in sys_new, "harden: 执行模式描述存在")
+    check("你的角色是实现" in sys_new, "harden: 执行模式描述存在")
     check(len(out) == 2, "harden: messages 数量不变（一条 system 替代一条）", f"len={len(out)}")
     check(out[1]["role"] == "user" and out[1]["content"] == "hi", "harden: 用户消息不动")
     out2, changed2 = payload.harden_system(list(out))
