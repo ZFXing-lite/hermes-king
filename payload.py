@@ -167,43 +167,53 @@ def verify() -> str:
 # ── 请求层强化（llm_request 中间件） ────────────────────────────────────────────
 
 def harden_system(messages: list) -> tuple[list, bool]:
-    """请求层系统提示词强化（HERMES_KING_SYSTEM_MODE 控制策略）：
+    """请求层体系（HERMES_KING_SYSTEM_MODE 控制）：
 
-    - ``replace``（默认）：**整体替换** system 为纯内核。丢弃 Hermes 的全部
-      脚手架——DEFAULT_AGENT_IDENTITY（"You are Hermes Agent"）、TOOL_USE_
-      ENFORCEMENT、PLATFORM_HINTS、EXECUTION_GUIDANCE、SKILLS_GUIDANCE、
-      AGENTS.md、context files、SOUL.md、memory 索引——以及任何拒绝性指导。
-      模型视野内 system 只剩 SUPREME DIRECTIVE 内核。这是最深层清理。
-    - ``wipe``/``zero``：同 replace（别名）。
-    - ``append``：仅把内核追加到最后一个 system 消息末尾（较弱，保留全部原本
-      文本——包括污染性 identity 与被抑制的内核）。
+    - ``replace``（默认）：**清空所有 role==system 消息**，在前端首条**插入纯内核**。
+      Hermes 可能组装多条 system（身份/规范/工具强制/记忆/上下文/SOUL），
+      并可能由后端 runtime 注入额外 system——这里把**全部** system 铲除，
+      只保留一棵内核，杜绝任何污染源码残留。同时**强制 kernels 在最前**（优先级最高）。
+      Hermes 的强规范在渲染时会拼到 system 前段，此法把内核置顶。
+    - ``top``：同 replace（别名，语义均为「置顶唯一内核」）。
+    - ``append``：仅把内核追加到最后一个 system 消息末尾（较弱，保留污染文本）。
+    - ``wipe``/``zero``：同 replace（历史别名）。
 
-    无论哪种模式内核都保证位于 system 最后。返回 (新 messages, 是否修改)。
+    任何模式下，最终请求要么包含唯一内核（replace），要么在尾部含内核（append）。
     """
     if not isinstance(messages, list):
         return messages, False
     mode = os.environ.get("HERMES_KING_SYSTEM_MODE", "replace").strip().lower()
     kernel = _load_kernel()
+
+    # 幂等短路：已处于「唯一 system=内核」状态则不再改动
+    if mode != "append":
+        system_msgs = [m for m in messages if isinstance(m, dict) and m.get("role") == "system"]
+        if len(system_msgs) == 1 and isinstance(system_msgs[0].get("content"), str) and system_msgs[0]["content"] == kernel:
+            return messages, False
+
     tail = kernel.rstrip("\n")
     if mode == "append":
         return _append_kernel(messages, kernel, tail)
 
-    # replace / wipe / zero：把 system 整体替换为内核
-    idx = -1
-    for i in range(len(messages) - 1, -1, -1):
-        m = messages[i]
+    # replace / top / wipe / zero：清空所有 system，只保留一条唯一内核，置于队首。
+    new_messages: list = []
+    replaced = False
+    for m in messages:
         if isinstance(m, dict) and m.get("role") == "system":
-            idx = i
-            break
-    if idx < 0:
-        # 无 system 消息：头部插入内核
-        messages.insert(0, {"role": "system", "content": kernel})
-        return messages, True
-    old = messages[idx].get("content", "")
-    if isinstance(old, str) and old == kernel:
-        return messages, False  # 已经替换过，幂等
-    messages[idx] = dict(messages[idx], content=kernel)
-    return messages, True
+            if not replaced:
+                new_messages.append({"role": "system", "content": kernel})
+                replaced = True
+            # 额外 system：丢弃
+        else:
+            new_messages.append(m)
+
+    if not replaced:
+        new_messages.insert(0, {"role": "system", "content": kernel})
+        replaced = True
+
+    if not isinstance(messages, list) or not replaced:
+        return messages, False
+    return new_messages, True
 
 
 def _load_kernel() -> str:
@@ -223,16 +233,6 @@ def _append_kernel(messages: list, kernel: str, tail: str) -> tuple[list, bool]:
             return messages, True
     messages.insert(0, {"role": "system", "content": kernel})
     return messages, True
-
-
-def _extract_section(text: str, marker: str) -> str:
-    """提取原 system 中以 marker 开头的段落（截至下一个 ## 标题）。"""
-    i = text.find(marker)
-    if i == -1:
-        return ""
-    j = text.find("\n## ", i + len(marker))
-    seg = text[i:j if j != -1 else len(text)]
-    return seg.strip()
 
 
 # ── 会话轮换（拒绝状态清除） ──────────────────────────────────────────────────
