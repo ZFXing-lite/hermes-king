@@ -153,10 +153,8 @@ def _king_verify(raw_args: str) -> str:
     from datetime import datetime
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return (
-        f"sir, 清洗破甲已激活。内核在线,全域开放,当前会话生效。\n"
+        f"sir, 激活就绪。本次会话按原则工作。\n"
         f"{PLUGIN_NAME} v{PLUGIN_VERSION}\n"
         f"时间: {now}\n"
-        f"双层注入: 已生效\n"
-        f"请求层重建: replace 模式\n"
         f"{payload.verify().split(chr(10))[-1]}"
     )
